@@ -1,0 +1,32 @@
+<div
+  class="ui-input"
+  [ngStyle]="{ 'margin-bottom': bottomSpace + 'px' }"
+  [ngClass]="{
+    active: isActive,
+    invalid:
+      this.inputControl?.control?.invalid &&
+      this.inputControl?.control?.touched,
+    empty: isEmpty,
+    disabled: isDisabled
+  }"
+>
+  <label>
+    <h3 *ngIf="passedLabel">{{ passedLabel }}</h3>
+    <div class="input-holder">
+      <input
+        [placeholder]="passedPlaceholder"
+        [disabled]="isDisabled"
+        autocomplete="off"
+        [type]="type"
+        (focus)="onFocus()"
+        (focusout)="onUnFocus()"
+        (blur)="onBlur()"
+        (ngModelChange)="change($event)"
+        (input)="onInput()"
+        [(ngModel)]="innerValue"
+      />
+      <span *ngIf="isEdit" class="icon icon-edit"></span>
+    </div>
+  </label>
+  <div class="error">{{ passedError }}</div>
+</div>

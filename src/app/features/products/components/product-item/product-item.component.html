@@ -1,0 +1,9 @@
+<ion-item [routerLink]="'/products/' + product.upc">
+  <ion-thumbnail slot="start">
+    <img [alt]="product.name" [src]="product.image" />
+  </ion-thumbnail>
+  <ion-label>
+    <h3>{{ product.name }}</h3>
+    <p>{{ product.description }}</p>
+  </ion-label>
+</ion-item>

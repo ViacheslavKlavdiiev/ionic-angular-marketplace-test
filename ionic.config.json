@@ -1,0 +1,7 @@
+{
+  "name": "ionic-angular-marketplace-test",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

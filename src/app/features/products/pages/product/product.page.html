@@ -1,0 +1,57 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title> Product </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+  <ng-container *ngIf="product$ | async as product; else loadingOrError">
+    <ion-card>
+      <img [alt]="product.name" [src]="product.image" />
+      <ion-card-header>
+        <ion-card-title>{{ product.name }}</ion-card-title>
+        <ion-card-subtitle>{{ product.description }}</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <ng-container *ngIf="product.category && product.category.length > 0">
+          <ion-chip *ngFor="let category of product.category" color="secondary"
+            >{{category.name}}</ion-chip
+          >
+        </ng-container>
+        <form class="calc-form" [formGroup]="calcForm">
+          <ui-input
+            type="number"
+            formControlName="quantity"
+            [passedLabel]="'Quantity'"
+            [passedPlaceholder]="'Quantity'"
+            [passedError]="'Some error ...'"
+          ></ui-input>
+          <ui-input
+            type="number"
+            formControlName="amount"
+            [passedLabel]="'Amount, $'"
+            [passedPlaceholder]="'Amount'"
+            [passedError]="'Some error ...'"
+          ></ui-input>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+</ion-content>
+
+<ng-template #loadingOrError>
+  <ng-container *ngIf="errorObject; else loading">
+    <ion-text color="warning">
+      <h3>H3: The quick brown fox jumps over the lazy dog</h3>
+    </ion-text>
+  </ng-container>
+</ng-template>
+
+<ng-template #loading>
+  <ion-item>
+    <ion-spinner name="dots"></ion-spinner>
+  </ion-item>
+</ng-template>

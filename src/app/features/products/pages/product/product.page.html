@@ -21,61 +21,10 @@
             >{{category.name}}</ion-chip
           >
         </ng-container>
-        <ion-grid>
-          <ion-row>
-            <ion-col size="6">
-              <ion-item>
-                <ion-grid>
-                  <ion-row>
-                    <ion-col size="6">
-                      <ion-button color="primary" (click)="setAmount(50)"
-                        >50$</ion-button
-                      >
-                    </ion-col>
-                    <ion-col size="6">
-                      <ion-button color="primary" (click)="setAmount(100)"
-                        >100$</ion-button
-                      >
-                    </ion-col>
-                  </ion-row>
-                </ion-grid>
-
-                <ion-label position="floating">Amount, $</ion-label>
-                <ion-input
-                  type="number"
-                  inputmode="numeric"
-                  [value]="amount"
-                  (ionInput)="changeAmount($event)"
-                ></ion-input>
-              </ion-item>
-            </ion-col>
-            <ion-col size="6">
-              <ion-item>
-                <ion-grid>
-                  <ion-row>
-                    <ion-col size="6">
-                      <ion-button (click)="setQuantity(10)" color="primary"
-                        >10</ion-button
-                      >
-                    </ion-col>
-                    <ion-col size="6">
-                      <ion-button (click)="setQuantity(25)" color="primary"
-                        >25</ion-button
-                      >
-                    </ion-col>
-                  </ion-row>
-                </ion-grid>
-
-                <ion-label position="floating">Quantity</ion-label>
-                <ion-input
-                  type="number"
-                  inputmode="numeric"
-                  [value]="quantity"
-                  (ionInput)="changeQuantity($event)"
-                ></ion-input>
-              </ion-item>
-            </ion-col> </ion-row
-        ></ion-grid>
+        <app-product-calc
+          (changeCalc)="changeCalc($event)"
+          [productPrice]="product.price"
+        ></app-product-calc>
       </ion-card-content>
     </ion-card>
   </ng-container>
@@ -84,10 +33,13 @@
 <ion-footer>
   <ion-toolbar>
     <ion-button
-      [disabled]="!quantity || !amount"
       expand="block"
+      [disabled]="!selectedProduct"
       (click)="addToCart()"
       >Add to cart</ion-button
+    >
+    <ion-button expand="block" fill="clear" (click)="navToProductsPage()"
+      >Go to all products</ion-button
     >
   </ion-toolbar>
 </ion-footer>

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ProductsRoutingModule } from './products-routing.module';
 import { IonicModule } from '@ionic/angular';
 import { AllProductsPage, ProductPage } from './pages';
-import { ProductItemComponent } from './components';
+import { ProductCalcComponent, ProductItemComponent } from './components';
 import { FilterPipe } from 'src/app/core/pipes/filter.pipe';
 
 @NgModule({
@@ -11,6 +11,7 @@ import { FilterPipe } from 'src/app/core/pipes/filter.pipe';
     AllProductsPage,
     ProductPage,
     ProductItemComponent,
+    ProductCalcComponent,
     FilterPipe,
   ],
   imports: [CommonModule, IonicModule, ProductsRoutingModule],

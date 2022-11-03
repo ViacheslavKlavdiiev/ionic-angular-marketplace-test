@@ -7,10 +7,10 @@ import {
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ToastController } from '@ionic/angular';
+import { NavController, ToastController } from '@ionic/angular';
 import { Observable, Subject, throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
-import { Product } from 'src/app/core/models';
+import { ICartItem, Product } from 'src/app/core/models';
 import { ProductsService } from 'src/app/core/services';
 
 @Component({
@@ -24,16 +24,14 @@ export class ProductPage implements OnInit, OnDestroy {
   public product$: Observable<Product>;
   public errorObject: HttpErrorResponse | null = null;
 
-  private totalPrice: number;
-
-  public amount: string;
-  public quantity: number = 1;
+  public selectedProduct: ICartItem;
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private cd: ChangeDetectorRef,
     private productsService: ProductsService,
-    private toastController: ToastController
+    private toastController: ToastController,
+    public navCtrl: NavController
   ) {}
 
   ngOnInit(): void {
@@ -47,36 +45,11 @@ export class ProductPage implements OnInit, OnDestroy {
         return throwError(() => new Error(err.error.message));
       })
     );
-
-    this.product$.pipe(takeUntil(this.destroy$)).subscribe((res) => {
-      this.totalPrice = res.price;
-      this.amount = (this.totalPrice * this.quantity).toFixed(2);
-    });
   }
 
-  public changeAmount(e) {
-    const quantity = Math.floor(+e.target.value / this.totalPrice);
-    if (this.quantity !== quantity) {
-      this.quantity = quantity;
-    }
-  }
-
-  public changeQuantity(e) {
-    let amount = e.target.value * this.totalPrice;
-    const amountFixed = amount.toFixed(2);
-    if (this.amount !== amountFixed) {
-      this.amount = amountFixed;
-    }
-  }
-
-  public setAmount(value: number) {
-    this.amount = value.toFixed(2);
-    this.quantity = Math.floor(value / this.totalPrice);
-  }
-
-  public setQuantity(value: number) {
-    this.quantity = value;
-    this.amount = (value * this.totalPrice).toFixed(2);
+  public changeCalc(event: ICartItem) {
+    this.selectedProduct = event;
+    this.cd.detectChanges();
   }
 
   public async addToCart() {
@@ -87,7 +60,12 @@ export class ProductPage implements OnInit, OnDestroy {
       color: 'success',
     });
 
+    //ToDo Need to create a Cart service with storage and set CartItem there
     await toast.present();
+  }
+
+  public navToProductsPage() {
+    this.navCtrl.navigateRoot('/products', { animated: true });
   }
 
   ngOnDestroy() {

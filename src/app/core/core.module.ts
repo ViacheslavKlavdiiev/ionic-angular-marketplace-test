@@ -8,6 +8,7 @@ import { HttpErrorInterceptor } from './http-interceptors/http-error.interceptor
 import { NotificationService } from './notifications/notification.service';
 
 import { RouterModule } from '@angular/router';
+import { IonicStorageModule } from '@ionic/storage-angular';
 
 export { NotificationService };
 
@@ -18,6 +19,7 @@ export { NotificationService };
     FormsModule,
     RouterModule,
     ReactiveFormsModule,
+    IonicStorageModule.forRoot(),
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptor, multi: true },

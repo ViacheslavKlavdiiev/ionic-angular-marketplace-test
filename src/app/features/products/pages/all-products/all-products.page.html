@@ -1,26 +1,33 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Toolbar</ion-title>
+    <ion-title>Searchbar</ion-title>
   </ion-toolbar>
   <ion-toolbar>
-    <ion-searchbar></ion-searchbar>
+    <ion-searchbar
+      [debounce]="600"
+      [value]="search"
+      (ionInput)="changeSearch($event)"
+    ></ion-searchbar>
   </ion-toolbar>
 </ion-header>
-<ion-content [fullscreen]="true">
-  <ion-list>
-    <ng-container *ngIf="products$ | async as products; else loadingOrError">
+<ion-content class="ion-padding" [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content> </ion-refresher-content>
+  </ion-refresher>
+  <ng-container *ngIf="products$ | async as products; else loadingOrError">
+    <ion-list>
       <app-product-item
-        *ngFor="let product of products"
+        *ngFor="let product of products | filter:search"
         [product]="product"
       ></app-product-item>
-    </ng-container>
-  </ion-list>
+    </ion-list>
+  </ng-container>
 </ion-content>
 
 <ng-template #loadingOrError>
   <ng-container *ngIf="errorObject; else loading">
     <ion-text color="warning">
-      <h3>H3: The quick brown fox jumps over the lazy dog</h3>
+      <h3>Something wrong... Try again later</h3>
     </ion-text>
   </ng-container>
 </ng-template>

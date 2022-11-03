@@ -7,9 +7,9 @@ import {
   OnInit,
 } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { Product } from 'src/app/core/models';
-import { ProductsService } from 'src/app/core/services';
+import { ProductsService, StorageService } from 'src/app/core/services';
 
 @Component({
   selector: 'app-all-products',
@@ -17,24 +17,61 @@ import { ProductsService } from 'src/app/core/services';
   styleUrls: ['./all-products.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AllProductsPage implements OnInit {
+export class AllProductsPage implements OnInit, OnDestroy {
   public errorObject: HttpErrorResponse | null = null;
-  public products$: Observable<Product[]>;
+  private destroy$ = new Subject<void>();
+  private productsArray: Subject<Product[]> = new Subject<Product[]>();
+  public products$: Observable<Product[]> = this.productsArray.asObservable();
+
+  public search = '';
 
   constructor(
     private cd: ChangeDetectorRef,
-    private productsService: ProductsService
-  ) {}
+    private productsService: ProductsService,
+    private storageService: StorageService
+  ) {
+    this.initSearch();
+  }
 
   ngOnInit(): void {
     this.errorObject = null;
-    this.productsService.getProducts();
-    this.products$ = this.productsService.products$.pipe(
+    this.productsService
+      .getProducts()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((res) => this.productsArray.next(res));
+    this.products$.pipe(
       catchError((err) => {
         this.errorObject = err;
         this.cd.detectChanges();
         return throwError(() => new Error(err.error.message));
       })
     );
+  }
+
+  refresh(event) {
+    setTimeout(() => {
+      this.productsService
+        .getProducts()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((res) => {
+          this.productsArray.next(res);
+          event.target.complete();
+        });
+    }, 300);
+  }
+
+  async initSearch() {
+    this.search = (await this.storageService.get('search')) || '';
+    this.cd.detectChanges();
+  }
+
+  public changeSearch(e: any) {
+    this.search = e.target.value;
+    this.storageService.set('search', this.search);
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

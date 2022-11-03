@@ -6,13 +6,8 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { ToastController } from '@ionic/angular';
 import { Observable, Subject, throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { Product } from 'src/app/core/models';
@@ -28,21 +23,23 @@ export class ProductPage implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   public product$: Observable<Product>;
   public errorObject: HttpErrorResponse | null = null;
-  public calcForm: FormGroup;
 
-  private totalPrice;
-  private totalQuantity;
+  private totalPrice: number;
+
+  public amount: string;
+  public quantity: number = 1;
 
   constructor(
-    private formBuilder: FormBuilder,
     private activatedRoute: ActivatedRoute,
     private cd: ChangeDetectorRef,
-    private productsService: ProductsService
+    private productsService: ProductsService,
+    private toastController: ToastController
   ) {}
 
   ngOnInit(): void {
     this.errorObject = null;
     const id = this.activatedRoute.snapshot.paramMap.get('id');
+
     this.product$ = this.productsService.getProduct(id).pipe(
       catchError((err) => {
         this.errorObject = err;
@@ -53,42 +50,44 @@ export class ProductPage implements OnInit, OnDestroy {
 
     this.product$.pipe(takeUntil(this.destroy$)).subscribe((res) => {
       this.totalPrice = res.price;
-      this.totalQuantity = res.sku;
-      this.initForm();
+      this.amount = (this.totalPrice * this.quantity).toFixed(2);
     });
   }
 
-  private initForm() {
-    this.calcForm = this.formBuilder.group({
-      amount: [this.totalPrice, []],
-      quantity: ['1', []],
+  public changeAmount(e) {
+    const quantity = Math.floor(+e.target.value / this.totalPrice);
+    if (this.quantity !== quantity) {
+      this.quantity = quantity;
+    }
+  }
+
+  public changeQuantity(e) {
+    let amount = e.target.value * this.totalPrice;
+    const amountFixed = amount.toFixed(2);
+    if (this.amount !== amountFixed) {
+      this.amount = amountFixed;
+    }
+  }
+
+  public setAmount(value: number) {
+    this.amount = value.toFixed(2);
+    this.quantity = Math.floor(value / this.totalPrice);
+  }
+
+  public setQuantity(value: number) {
+    this.quantity = value;
+    this.amount = (value * this.totalPrice).toFixed(2);
+  }
+
+  public async addToCart() {
+    const toast = await this.toastController.create({
+      message: 'Product successfully added',
+      duration: 1500,
+      position: 'top',
+      color: 'success',
     });
 
-    this.amountFormControl.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((res) => {
-        const quantity = Math.floor(res / this.totalPrice);
-        if (this.quantityFormControl.value !== quantity) {
-          this.quantityFormControl.setValue(quantity);
-        }
-      });
-
-    this.quantityFormControl.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((res) => {
-        const amount = this.totalPrice * res;
-        if (this.amountFormControl.value !== amount) {
-          this.amountFormControl.setValue(amount.toFixed(2));
-        }
-      });
-  }
-
-  get amountFormControl() {
-    return this.calcForm.get('amount') as FormControl;
-  }
-
-  get quantityFormControl() {
-    return this.calcForm.get('quantity') as FormControl;
+    await toast.present();
   }
 
   ngOnDestroy() {

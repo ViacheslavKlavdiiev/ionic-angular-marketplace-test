@@ -4,18 +4,15 @@ import { ProductsRoutingModule } from './products-routing.module';
 import { IonicModule } from '@ionic/angular';
 import { AllProductsPage, ProductPage } from './pages';
 import { ProductItemComponent } from './components';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { UIInputComponent } from 'src/app/shared/ui';
+import { FilterPipe } from 'src/app/core/pipes/filter.pipe';
 
 @NgModule({
-  declarations: [AllProductsPage, ProductPage, ProductItemComponent],
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    FormsModule,
-    IonicModule,
-    ProductsRoutingModule,
-    UIInputComponent,
+  declarations: [
+    AllProductsPage,
+    ProductPage,
+    ProductItemComponent,
+    FilterPipe,
   ],
+  imports: [CommonModule, IonicModule, ProductsRoutingModule],
 })
 export class ProductsModule {}
